@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,9 +23,25 @@ namespace MvcClient
                     config.ClientId = "client_id_mvc";
                     config.ClientSecret = "client_secret_mvc";
                     config.SaveTokens = true;
-
                     config.ResponseType = "code";
+
+                    // configure cookie claim mapping
+                    config.ClaimActions.DeleteClaims("amr");
+                    config.ClaimActions.DeleteClaims("s_hash");
+                    config.ClaimActions.MapUniqueJsonKey("RawCoding.Grandma", "rc.grandma");
+
+                    // two trips to load claims in to the cookie
+                    // but this makes id token small with cost of two trips
+                    config.GetClaimsFromUserInfoEndpoint = true;
+
+                    //configure scope
+                    config.Scope.Clear();
+                    config.Scope.Add("openid");
+                    config.Scope.Add("rc.scope");
+                    config.Scope.Add("ApiOne");
                 });
+
+            services.AddHttpClient();
 
             services.AddControllersWithViews();
         }

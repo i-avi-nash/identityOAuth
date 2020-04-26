@@ -11,13 +11,21 @@ namespace IdentityServer
             new List<IdentityResource>
             {
                 new IdentityResources.OpenId(),
-                new IdentityResources.Profile()
+                //new IdentityResources.Profile(),
+                new IdentityResource
+                {
+                    Name="rc.scope",
+                    UserClaims=
+                    {
+                        "rc.grandma"
+                    }
+                }
             };
 
         public static IEnumerable<ApiResource> GetApis() =>
             new List<ApiResource>
             {
-                new ApiResource("ApiOne"),
+                new ApiResource("ApiOne", new string[] { "rc.api.grandma" }),
                 new ApiResource("ApiTwo")
             };
 
@@ -46,8 +54,12 @@ namespace IdentityServer
                         "ApiOne",
                         "ApiTwo",
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
+                        //IdentityServerConstants.StandardScopes.Profile,
+                        "rc.scope"
                     },
+
+                    // puts all the claims in the id_token
+                    //AlwaysIncludeUserClaimsInIdToken = true,
 
                     RequireConsent = false
                 }
