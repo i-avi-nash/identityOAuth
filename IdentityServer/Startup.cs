@@ -6,16 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IdentityServer
 {
     public class Startup
     {
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration config)
+        public Startup(IConfiguration config, IWebHostEnvironment env)
         {
             _config = config;
+            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -48,6 +52,9 @@ namespace IdentityServer
 
             var assembly = typeof(Startup).Assembly.GetName().Name;
 
+            var filePath = Path.Combine(_env.ContentRootPath, "is_cert.pfx");
+            var certificate = new X509Certificate2(filePath, "password");
+
             services.AddIdentityServer()
                 .AddAspNetIdentity<IdentityUser>()
 
@@ -63,10 +70,11 @@ namespace IdentityServer
                     options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
                         sql => sql.MigrationsAssembly(assembly));
                 })
-                //.AddInMemoryApiResources(Configuration.GetApis())
-                //.AddInMemoryIdentityResources(Configuration.GetIdentityResources())
-                //.AddInMemoryClients(Configuration.GetClients())
-                .AddDeveloperSigningCredential();
+                .AddSigningCredential(certificate);
+            //.AddInMemoryApiResources(Configuration.GetApis())
+            //.AddInMemoryIdentityResources(Configuration.GetIdentityResources())
+            //.AddInMemoryClients(Configuration.GetClients())
+            //.AddDeveloperSigningCredential();
 
             services.AddControllersWithViews();
         }
