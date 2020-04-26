@@ -74,8 +74,12 @@ namespace IdentityServer
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        "ApiOne"
+                        "ApiOne",
+                        "ApiTwo",
+                        "rc.scope"
                     },
+
+                    AccessTokenLifetime = 1,
 
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false
